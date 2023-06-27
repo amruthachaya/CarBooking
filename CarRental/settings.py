@@ -1,5 +1,12 @@
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+from credential import DB
+
+load_dotenv(override=True)
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -74,10 +81,10 @@ WSGI_APPLICATION = 'CarRental.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'CarRent',
-        'USER': 'postgres',
-        'PASSWORD': 'amrutha',
-        'HOST': '127.0.0.1',
+        'NAME': DB['NAME'],
+        'USER': DB['USER'],
+        'PASSWORD': DB['PASSWORD'],
+        'HOST': DB['HOST'],
         'PORT': '5432',
     }
 }
