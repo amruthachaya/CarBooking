@@ -45,6 +45,7 @@ def customer_signup(request):
         alert = True
         return render(request, "customer_signup.html", {'alert': alert})
     return render(request, "customer_signup.html")
+    return
 
 
 def customer_login(request):
