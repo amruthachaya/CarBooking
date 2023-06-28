@@ -34,6 +34,9 @@ class Car(models.Model):
         return self.name
 
 
+
+
+
 class Customer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     phone = models.CharField(validators=[MinLengthValidator(10), MaxLengthValidator(10)], max_length=10)
@@ -51,3 +54,6 @@ class Order(models.Model):
     rent = models.CharField(max_length=10)
     days = models.CharField(max_length=3)
     is_complete = models.BooleanField(default=False)
+
+
+
