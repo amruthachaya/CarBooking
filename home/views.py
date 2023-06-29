@@ -12,11 +12,11 @@ def index(request):
     return render(request, "index.html", {'cars': cars})
 
 
-def signup(request):
+def signup_notification():
     print("Welcome To Car Booking System!!You are successfully logged in..")
 
 
-def orders(request):
+def order_notification():
     print("You're Vehicle Order is Confirmed")
 
 
@@ -51,7 +51,7 @@ def customer_signup(request):
             location = Location.objects.get(city=city.lower())
             customer = Customer(user=user, phone=phone, location=location, type="Customer")
         customer.save()
-        signup(request)
+        signup_notification()
         alert = True
         return render(request, "customer_signup.html", {'alert': alert})
     return render(request, "customer_signup.html")
@@ -106,7 +106,7 @@ def car_dealer_signup(request):
             location = Location.objects.get(city=city.lower())
             car_dealer = CarDealer(car_dealer=user, phone=phone, location=location, type="Car Dealer")
         car_dealer.save()
-        signup(request)
+        signup_notification()
         alert = True
         return render(request, "car_dealer_signup.html", {"alert": alert})
     return render(request, "car_dealer_signup.html")
@@ -248,7 +248,7 @@ def order_details(request):
             order = Order.objects.get(car=car, car_dealer=car_dealer, user=user, rent=rent, days=days)
         car.is_available = False
         car.save()
-        orders(request)
+        order_notification()
         return render(request, "order_details.html", {'order': order})
     return render(request, "order_details.html")
 
