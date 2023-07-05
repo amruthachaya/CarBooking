@@ -4,11 +4,20 @@ from django.contrib.auth.models import User
 from .models import *
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+import uuid
 
 
 def index(request):
     cars = Car.objects.all()
     return render(request, "index.html", {'cars': cars})
+
+
+def signup_notification():
+    print("Welcome To Car Booking System!!You are successfully logged in..")
+
+
+def order_notification():
+    print("You're Vehicle Order is Confirmed")
 
 
 def customer_signup(request):
@@ -42,10 +51,10 @@ def customer_signup(request):
             location = Location.objects.get(city=city.lower())
             customer = Customer(user=user, phone=phone, location=location, type="Customer")
         customer.save()
+        signup_notification()
         alert = True
         return render(request, "customer_signup.html", {'alert': alert})
     return render(request, "customer_signup.html")
-    return
 
 
 def customer_login(request):
@@ -97,6 +106,7 @@ def car_dealer_signup(request):
             location = Location.objects.get(city=city.lower())
             car_dealer = CarDealer(car_dealer=user, phone=phone, location=location, type="Car Dealer")
         car_dealer.save()
+        signup_notification()
         alert = True
         return render(request, "car_dealer_signup.html", {"alert": alert})
     return render(request, "car_dealer_signup.html")
@@ -132,6 +142,8 @@ def add_car(request):
         car_name = request.POST['car_name']
         city = request.POST['city']
         image = request.FILES['image']
+        image_uuid = uuid.uuid4().int
+        print(image_uuid)
         capacity = request.POST['capacity']
         rent = request.POST['rent']
         car_dealer = CarDealer.objects.get(car_dealer=request.user)
@@ -236,6 +248,7 @@ def order_details(request):
             order = Order.objects.get(car=car, car_dealer=car_dealer, user=user, rent=rent, days=days)
         car.is_available = False
         car.save()
+        order_notification()
         return render(request, "order_details.html", {'order': order})
     return render(request, "order_details.html")
 

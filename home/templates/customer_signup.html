@@ -25,10 +25,24 @@
       <input type="text" placeholder="Enter Contact Number" name="phone" required>
 
       <label><b>City</b></label>
-      <input type="text" placeholder="Enter City" name="city" required>
-  
-      <label><b>Password</b></label>
-      <input type="password" placeholder="Enter Password" name="password1" required>
+      <select name="city" required>
+      <option value="">--Select City--</option>
+      <option value="Bangalore">Bangalore</option>
+      <option value="Mangalore">Mangalore</option>
+      <option value="udupi">udupi</option>
+        <option value="Delhi">Delhi</option>
+        <option value="Hyderbad">Hyderbad</option>
+      <option value="Mumbai">Mumbai</option>
+      <option value="Shivamogga">Shivamogga</option>
+        <option value="Mysore">Mysore</option>
+        <option value="kolar">kolar</option>
+      </select>
+
+      <div style="margin-top: 20px;">
+    <label><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="password1" required>
+    </div>
+
 
       <label><b>Confirm Password</b></label>
       <input type="password" placeholder="Confirm Password" name="password2" required>

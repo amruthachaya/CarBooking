@@ -13,7 +13,7 @@ class Location(models.Model):
 class CarDealer(models.Model):
     car_dealer = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(validators=[MinLengthValidator(10), MaxLengthValidator(10)], max_length=10)
-    location = models.OneToOneField(Location, on_delete=models.PROTECT)
+    location = models.ForeignKey(Location, on_delete=models.PROTECT)
     earnings = models.IntegerField(default=0)
     type = models.CharField(max_length=20, blank=True)
 
@@ -34,6 +34,9 @@ class Car(models.Model):
         return self.name
 
 
+
+
+
 class Customer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     phone = models.CharField(validators=[MinLengthValidator(10), MaxLengthValidator(10)], max_length=10)
@@ -51,3 +54,6 @@ class Order(models.Model):
     rent = models.CharField(max_length=10)
     days = models.CharField(max_length=3)
     is_complete = models.BooleanField(default=False)
+
+
+
