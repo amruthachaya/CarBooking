@@ -13,12 +13,18 @@
     </div>
     
     <div class="row mt-3">
-        <div class="form-group col-md-6">
-            <label><i style="font-weight: bold;">City</i></label>
-            <input type="text" class="form-control" name="city" placeholder="City">
+        <div style="margin-top: 15px;">
+        <div class="form-group col-md-6"><label><b>City</b></label>
+      <select name ="city" required>
+        {% for l in location %}
+         <option value={{ l }}>{{ l }}</option>
+        {% endfor %}
+      </select>
+            </div>
         </div>
         <div class="form-group col-md-6">
-            <label><i style="font-weight: bold;">Car Image</i></label>
+            <div style="margin-top: 15px;">
+                <label><i style="font-weight: bold;">Car Image</i></label></div>
             <input type="file" class="form-control" name="image">
         </div>
     </div>

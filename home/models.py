@@ -9,9 +9,13 @@ class Location(models.Model):
     def __str__(self):
         return self.city
 
+    @classmethod
+    def city_list(cls):
+        return cls.objects.all().order_by('city').values_list("city", flat=True)
+
 
 class CarDealer(models.Model):
-    car_dealer = models.OneToOneField(User, on_delete=models.CASCADE)
+    car_dealer = models.ForeignKey(User, on_delete=models.CASCADE)
     phone = models.CharField(validators=[MinLengthValidator(10), MaxLengthValidator(10)], max_length=10)
     location = models.ForeignKey(Location, on_delete=models.PROTECT)
     earnings = models.IntegerField(default=0)
@@ -34,9 +38,6 @@ class Car(models.Model):
         return self.name
 
 
-
-
-
 class Customer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     phone = models.CharField(validators=[MinLengthValidator(10), MaxLengthValidator(10)], max_length=10)
@@ -54,6 +55,3 @@ class Order(models.Model):
     rent = models.CharField(max_length=10)
     days = models.CharField(max_length=3)
     is_complete = models.BooleanField(default=False)
-
-
-

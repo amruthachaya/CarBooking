@@ -1,0 +1,69 @@
+[1mdiff --git a/home/models.py b/home/models.py[m
+[1mindex 6c4ab77..fbd892a 100644[m
+[1m--- a/home/models.py[m
+[1m+++ b/home/models.py[m
+[36m@@ -11,7 +11,7 @@[m [mclass Location(models.Model):[m
+ [m
+ [m
+ class CarDealer(models.Model):[m
+[31m-    car_dealer = models.OneToOneField(User, on_delete=models.CASCADE)[m
+[32m+[m[32m    car_dealer = models.ForeignKey(User, on_delete=models.CASCADE)[m
+     phone = models.CharField(validators=[MinLengthValidator(10), MaxLengthValidator(10)], max_length=10)[m
+     location = models.ForeignKey(Location, on_delete=models.PROTECT)[m
+     earnings = models.IntegerField(default=0)[m
+[36m@@ -34,9 +34,6 @@[m [mclass Car(models.Model):[m
+         return self.name[m
+ [m
+ [m
+[31m-[m
+[31m-[m
+[31m-[m
+ class Customer(models.Model):[m
+     user = models.ForeignKey(User, on_delete=models.CASCADE)[m
+     phone = models.CharField(validators=[MinLengthValidator(10), MaxLengthValidator(10)], max_length=10)[m
+[36m@@ -54,6 +51,3 @@[m [mclass Order(models.Model):[m
+     rent = models.CharField(max_length=10)[m
+     days = models.CharField(max_length=3)[m
+     is_complete = models.BooleanField(default=False)[m
+[31m-[m
+[31m-[m
+[31m-[m
+[1mdiff --git a/home/templates/customer_login.html b/home/templates/customer_login.html[m
+[1mindex e0833d7..e4b834c 100644[m
+[1m--- a/home/templates/customer_login.html[m
+[1m+++ b/home/templates/customer_login.html[m
+[36m@@ -34,4 +34,5 @@[m
+   document.location = "/customer_login"[m
+   {% endif %}[m
+ </script>[m
+[31m-{% endblock %}[m
+\ No newline at end of file[m
+[32m+[m[32m{% endblock %}[m
+[41m+[m
+[1mdiff --git a/home/templates/index.html b/home/templates/index.html[m
+[1mindex 7da5a86..2ff6595 100644[m
+[1m--- a/home/templates/index.html[m
+[1m+++ b/home/templates/index.html[m
+[36m@@ -6,7 +6,7 @@[m
+ <div class="container mt-4">[m
+     <div>[m
+       <h1 class="display-4"> Online Car Rental Booking System</h1>[m
+[31m-        <h2 class ="display-10"> The perfect car for your next trip is just around the corner Book your drive now!</h2>[m
+[32m+[m[32m        <h2 class ="display-10">The perfect car for your next trip is just around the corner Book your drive now!</h2>[m
+       <p class="lead">You can select from the wide range of Cars available.</p>[m
+       <hr class="my-4">[m
+     </div>[m
+[1mdiff --git a/home/views.py b/home/views.py[m
+[1mindex 6067b16..946394d 100644[m
+[1m--- a/home/views.py[m
+[1m+++ b/home/views.py[m
+[36m@@ -70,6 +70,9 @@[m [mdef customer_login(request):[m
+                 user1 = Customer.objects.get(user=user)[m
+                 if user1.type == "Customer":[m
+                     login(request, user)[m
+[32m+[m[32m                else:[m
+[32m+[m[32m                    alert = True[m
+[32m+[m[32m                    # return render(request, "customer_login.html", {'alert': alert})[m
+                     return redirect("/customer_homepage")[m
+             else:[m
+                 alert = True[m
