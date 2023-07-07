@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
@@ -74,7 +75,7 @@ def customer_login(request):
                 else:
                     alert = True
                     return render(request, "customer_login.html", {'alert': alert})
-                    return redirect("/customer_homepage")
+                    # return redirect("/customer_homepage")
             else:
                 alert = True
                 return render(request, "customer_login.html", {'alert': alert})
@@ -138,8 +139,10 @@ def car_dealer_login(request):
 
 
 def signout(request):
-    logout(request)
-    return redirect('/')
+    if request.method == 'POST':
+        logout(request)
+        return redirect('/')
+    return render(request, 'logout.html')
 
 
 def add_car(request):
@@ -175,8 +178,8 @@ def all_cars(request):
     return render(request, "all_cars.html", {'cars': cars})
 
 
-def edit_car(request, myid):
-    car = Car.objects.filter(id=myid)[0]
+def edit_car(request, iid):
+    car = Car.objects.get(id=iid)
     if request.method == "POST":
         car_name = request.POST['car_name']
         city = request.POST['city']
@@ -220,7 +223,7 @@ def search_results(request):
     for a in location:
         cars = Car.objects.filter(location=a)
         for car in cars:
-            if car.is_available == True:
+            if car.is_available:
                 vehicle_dictionary = {'name': car.name, 'id': car.id, 'image': car.image.url, 'city': car.location.city,
                                       'capacity': car.capacity}
                 vehicles_list.append(vehicle_dictionary)
