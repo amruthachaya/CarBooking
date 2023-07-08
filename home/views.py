@@ -54,7 +54,7 @@ def customer_signup(request):
         signup_notification()
         alert = True
         return render(request, "customer_signup.html", {'alert': alert})
-    return render(request, "customer_signup.html")
+    return render(request, "customer_signup.html", {"location": Location.city_list()})
 
 
 def customer_login(request):
@@ -71,10 +71,14 @@ def customer_login(request):
                 if user1.type == "Customer":
                     login(request, user)
                     return redirect("/customer_homepage")
+                else:
+                    alert = True
+                    return render(request, "customer_login.html", {'alert': alert})
+                    return redirect("/customer_homepage")
             else:
                 alert = True
                 return render(request, "customer_login.html", {'alert': alert})
-    return render(request, "customer_login.html")
+    return render(request, "customer_login.html", {"location": Location.city_list()})
 
 
 def car_dealer_signup(request):
@@ -108,8 +112,9 @@ def car_dealer_signup(request):
         car_dealer.save()
         signup_notification()
         alert = True
+
         return render(request, "car_dealer_signup.html", {"alert": alert})
-    return render(request, "car_dealer_signup.html")
+    return render(request, "car_dealer_signup.html", {"location": Location.city_list()})
 
 
 def car_dealer_login(request):
@@ -161,7 +166,7 @@ def add_car(request):
         car.save()
         alert = True
         return render(request, "add_car.html", {'alert': alert})
-    return render(request, "add_car.html")
+    return render(request, "add_car.html", {"location": Location.city_list()})
 
 
 def all_cars(request):
@@ -204,7 +209,7 @@ def delete_car(request, myid):
 
 
 def customer_homepage(request):
-    return render(request, "customer_homepage.html")
+    return render(request, "customer_homepage.html", {"location": Location.city_list()})
 
 
 def search_results(request):
@@ -262,7 +267,7 @@ def past_orders(request):
         orders = None
     if orders is not None:
         for order in orders:
-            if order.is_complete == False:
+            if not order.is_complete:
                 order_dictionary = {'id': order.id, 'rent': order.rent, 'car': order.car, 'days': order.days,
                                     'car_dealer': order.car_dealer}
                 all_orders.append(order_dictionary)
@@ -282,7 +287,7 @@ def all_orders(request):
     orders = Order.objects.filter(car_dealer=car_dealer)
     all_orders = []
     for order in orders:
-        if order.is_complete == False:
+        if not order.is_complete:
             all_orders.append(order)
     return render(request, "all_orders.html", {'all_orders': all_orders})
 
