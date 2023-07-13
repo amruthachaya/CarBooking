@@ -20,5 +20,8 @@ urlpatterns = [
     path("all_orders/", views.all_orders, name="all_orders"),
     path("complete_order/", views.complete_order, name="complete_order"),
     path("earnings/", views.earnings, name="earnings"),
-    path("signout/", views.signout, name="signout")
+    path("signout/", views.signout, name="signout"),
+    path('terms_and_conditions/', views.terms_and_conditions, name='terms_and_conditions'),
+    path('terms_and_privacy/', views.terms_and_privacy, name='terms_and_privacy'),
+    path("About_Us/", views.about_us, name='about_us')
 ]

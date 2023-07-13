@@ -6,6 +6,7 @@ from .models import *
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import uuid
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def index(request):
@@ -58,6 +59,33 @@ def customer_signup(request):
     return render(request, "customer_signup.html", {"location": Location.city_list()})
 
 
+# def customer_login(request):
+#     if request.user.is_authenticated:
+#         return redirect("/")
+#     else:
+#         if request.method == "POST":
+#             username = request.POST['username']
+#             password = request.POST['password']
+#             user = authenticate(username=username, password=password)
+#
+#             if user is not None:
+#                 user1 = Customer.objects.get(user=user)
+#                 if user1.type == "Customer":
+#                     login(request, user)
+#                     return redirect("/customer_homepage")
+#                 elif user.type == "Car Dealer":
+#                     return redirect("/customer_homepage")
+#
+#                 # else:
+#                 #     alert = True
+#                 #     # return render(request, "customer_login.html", {'alert': alert})
+#                 #     return redirect("/customer_homepage")
+#             else:
+#                 alert = True
+#                 return render(request, "customer_login.html", {'alert': alert})
+#     return render(request, "customer_login.html", {"location": Location.city_list()})
+
+
 def customer_login(request):
     if request.user.is_authenticated:
         return redirect("/")
@@ -68,17 +96,21 @@ def customer_login(request):
             user = authenticate(username=username, password=password)
 
             if user is not None:
-                user1 = Customer.objects.get(user=user)
-                if user1.type == "Customer":
-                    login(request, user)
-                    return redirect("/customer_homepage")
-                else:
+                try:
+                    user1 = Customer.objects.get(user=user)
+                    if user1.type == "Customer":
+                        login(request, user)
+                        return redirect("/customer_homepage")
+                    elif user1.type == "Car Dealer":
+                        alert = True
+                        return render(request, "customer_login.html", {'alert': alert})
+                except ObjectDoesNotExist:
                     alert = True
                     return render(request, "customer_login.html", {'alert': alert})
-                    # return redirect("/customer_homepage")
-            else:
-                alert = True
-                return render(request, "customer_login.html", {'alert': alert})
+
+            alert = True
+            return render(request, "customer_login.html", {'alert': alert})
+
     return render(request, "customer_login.html", {"location": Location.city_list()})
 
 
@@ -128,14 +160,21 @@ def car_dealer_login(request):
             user = authenticate(username=username, password=password)
 
             if user is not None:
-                user1 = CarDealer.objects.get(car_dealer=user)
-                if user1.type == "Car Dealer":
-                    login(request, user)
-                    return redirect("/all_cars")
-                else:
+                try:
+                    user1 = CarDealer.objects.get(car_dealer=user)
+                    if user1.type == "Car Dealer":
+                        login(request, user)
+                        return redirect("/all_cars")
+                    elif user1.type == "Customer":
+                        alert = True
+                        return render(request, "car_dealer_login.html", {"alert": alert})
+                except ObjectDoesNotExist:
                     alert = True
                     return render(request, "car_dealer_login.html", {"alert": alert})
-    return render(request, "car_dealer_login.html")
+
+            alert = True
+            return render(request, "car_dealer_login.html", {"alert": alert})
+        return render(request, "car_dealer_login.html", {"location": Location.city_list()})
 
 
 def signout(request):
@@ -315,3 +354,15 @@ def earnings(request):
     for order in orders:
         all_orders.append(order)
     return render(request, "earnings.html", {'amount': car_dealer.earnings, 'all_orders': all_orders})
+
+
+def terms_and_conditions(request):
+    return render(request, 'terms_and_conditions.html')
+
+
+def terms_and_privacy(request):
+    return render(request, 'terms_and_privacy.html')
+
+
+def about_us(request):
+    return render(request, "About_Us.html")
