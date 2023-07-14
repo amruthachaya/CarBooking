@@ -379,7 +379,7 @@ def gps(request):
 
 
 class GpsView(APIView):
-    def get(self, request):
+    def post(self, request):
         gps_data = request.query_params.dict()
         gps_data.update({"device_id": gps_data['id']})
         gps_data.pop('id', None)
