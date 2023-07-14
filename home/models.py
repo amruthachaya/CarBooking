@@ -55,6 +55,3 @@ class Order(models.Model):
     rent = models.CharField(max_length=10)
     days = models.CharField(max_length=3)
     is_complete = models.BooleanField(default=False)
-
-
-

@@ -37,6 +37,7 @@
                     <th>Image</th>
                     <th>City</th>
                     <th>Capacity</th>
+                    <th>Edit</th>
                     <th>Delete</th>
                 </tr>
                 {% for car in cars %}
@@ -45,8 +46,11 @@
                     <td><img src="{{car.image.url}}" alt="" width="100px" height="100px"></td>
                     <td>{{car.location.city}}</td>
                     <td>{{car.capacity}}</td>
+                    <td><a href="/edit_car/{{car.id}}/" class="btn btn-danger"
+                            onclick="return confirm('Are you sure you want to edit {{car.name}}?')">Edit</a></td>
                     <td><a href="/delete_car/{{car.id}}/" class="btn btn-danger"
                             onclick="return confirm('Are you sure you want to delete {{car.name}}?')">Delete</a></td>
+
                 </tr>
                 {% endfor %}
             </tbody>
@@ -56,4 +60,5 @@
         <h2>No Cars Added Yet</h2>
         {% endif %}
     </div>
+</div>
     {% endblock %}
