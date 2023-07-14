@@ -23,5 +23,7 @@ urlpatterns = [
     path("signout/", views.signout, name="signout"),
     path('terms_and_conditions/', views.terms_and_conditions, name='terms_and_conditions'),
     path('terms_and_privacy/', views.terms_and_privacy, name='terms_and_privacy'),
-    path("About_Us/", views.about_us, name='about_us')
+    path("About_Us/", views.about_us, name='about_us'),
+    path("gps/", views.GpsView.as_view(), name='gps'),
+
 ]
