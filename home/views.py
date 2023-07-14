@@ -1,10 +1,8 @@
-from django.contrib import messages
+from django.core.cache import cache
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
 from .models import *
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 import uuid
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -39,6 +37,7 @@ def customer_signup(request):
             return redirect("/customer_signup")
 
         user = User.objects.create_user(username=username, email=email, first_name=first_name, last_name=last_name,
+
                                         password=password1)
         user.save()
         try:
@@ -356,6 +355,12 @@ def earnings(request):
     return render(request, "earnings.html", {'amount': car_dealer.earnings, 'all_orders': all_orders})
 
 
+def payment(request):
+    user = request.user
+    username = Customer.objects.get(username=user)
+    contact = Customer.objects.get()
+
+
 def terms_and_conditions(request):
     return render(request, 'terms_and_conditions.html')
 
@@ -365,4 +370,9 @@ def terms_and_privacy(request):
 
 
 def about_us(request):
+    return render(request, "About_Us.html")
+
+def gps(request):
+    gps_data = dict(request.GET)
+    print(type(gps_data))
     return render(request, "About_Us.html")
