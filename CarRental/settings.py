@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-from credential import DB
+from credential import DB, aws
 
 load_dotenv(override=True)
 
@@ -109,6 +109,19 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# aws configs
+# AWS S3 Configuration
+AWS_ACCESS_KEY_ID = aws['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = aws['AWS_SECRET_ACCESS_KEY']
+AWS_STORAGE_BUCKET_NAME = aws['AWS_STORAGE_BUCKET_NAME']
+
+# # Your app endpoint
+# AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')
+#
+# # Only public read for now
+# AWS_QUERYSTRING_AUTH = False
+# AWS_DEFAULT_ACL = 'public-read'
 
 
 # Internationalization

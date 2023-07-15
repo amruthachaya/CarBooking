@@ -69,6 +69,11 @@ class Tracking(models.Model):
     batt = models.FloatField(default=0.0)
     charge = models.FloatField(default=True)
 
+    @classmethod
+    def last_location(cls, device_id):
+        return cls.objects.filter(device_id=device_id).only('lat', 'lon', 'timestamp').\
+            values('lat', 'lon', 'timestamp').last()
+
 
 
 
