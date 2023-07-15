@@ -1,6 +1,8 @@
-from django.core.cache import cache
+from django.views.decorators.cache import cache_page
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
+
 from .models import *
 from django.contrib.auth import authenticate, login, logout
 import uuid
@@ -361,16 +363,23 @@ def payment(request):
     contact = Customer.objects.get()
 
 
+@csrf_exempt
+@cache_page(60 * 15)
 def terms_and_conditions(request):
     return render(request, 'terms_and_conditions.html')
 
 
+@csrf_exempt
+@cache_page(60 * 15)
 def terms_and_privacy(request):
     return render(request, 'terms_and_privacy.html')
 
 
+@csrf_exempt
+@cache_page(60 * 15)
 def about_us(request):
     return render(request, "About_Us.html")
+
 
 def gps(request):
     gps_data = dict(request.GET)
