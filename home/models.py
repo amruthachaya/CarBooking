@@ -71,8 +71,8 @@ class Tracking(models.Model):
 
     @classmethod
     def last_location(cls, device_id):
-        return cls.objects.filter(device_id=device_id).only('lat', 'lon', 'timestamp').\
-            values('lat', 'lon', 'timestamp').last()
+        return cls.objects.filter(device_id=device_id).only('lat', 'lon', 'timestamp', 'accuracy').\
+            values('lat', 'lon', 'timestamp', 'accuracy').last()
 
 
 

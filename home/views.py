@@ -388,3 +388,9 @@ class GpsView(APIView):
         gps_ser.save()
         return Response({"status": "OK"}, status=status.HTTP_200_OK)
 
+
+class CurrentLocationView(APIView):
+    def get(self, request, device_id):
+
+        return render(request=request, template_name='live_location.html', context={"data": Tracking.last_location(device_id=device_id)})
+
