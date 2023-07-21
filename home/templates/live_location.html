@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -38,7 +39,7 @@
     }).addTo(map_init);
     L.Control.geocoder().addTo(map_init);
 
-    var marker, circle, polygon, lat, long, accuracy;
+    var marker, circle, lat, long, accuracy;
 
     lat = {{ data.lat }}
     long = {{ data.lon }}
@@ -51,8 +52,6 @@
     if (circle) {
         map_init.removeLayer(circle)
     }
-    if (polygon) {
-        map_init.removeLayer(marker)
 
     marker = L.marker([lat, long])
     circle = L.circle([lat, long], {radius: accuracy})
@@ -61,9 +60,9 @@
 
     map_init.fitBounds(featureGroup.getBounds())
 
+    marker.bindPopup("<b>Hello</b><br>This is Your current location.").openPopup();
+    circle.bindPopup("{{data.device_id}}");
     console.log("Your coordinate is: Lat: " + lat + " Long: " + long + " Accuracy: " + accuracy)
-
 </script>
 </body>
-
 </html>

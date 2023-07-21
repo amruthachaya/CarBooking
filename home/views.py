@@ -393,5 +393,18 @@ class GpsView(APIView):
 
 class CurrentLocationView(APIView):
     def get(self, request, device_id):
+        # vehicle = Car.objects.get(vehicle_number='KA34BN7755')
         return render(request=request, template_name='live_location.html',
                       context={"data": Tracking.last_location(device_id=device_id)})
+
+#
+# class CurrentLocationView(APIView):
+#     def get(self, request, tracking_id):
+#         return render(request=request, template_name='live_location.html',
+#                       context={"data": Car.last_location(tracking_id=tracking_id)})
+
+
+class LocationView(APIView):
+    def get(self, request, device_id):
+        return render(request=request, template_name='root_path.html',
+                      context={"data": Tracking.root_path(device_id=device_id)})
