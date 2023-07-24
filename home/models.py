@@ -57,7 +57,7 @@ class Car(models.Model):
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     is_available = models.BooleanField(default=True)
     rent = models.CharField(max_length=10, blank=True)
-    tracking = models.ForeignKey(Tracking, on_delete=models.PROTECT, null=True)
+    tracking = models.CharField(max_length=10, null=True)
 
     # @classmethod
     # def last_location(cls, tracking_id):
