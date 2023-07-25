@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from django.http.response import HttpResponseRedirect
 from django.core.cache import cache
 from django.shortcuts import render, redirect
@@ -63,33 +65,6 @@ def customer_signup(request):
         alert = True
         return render(request, "customer_signup.html", {'alert': alert})
     return render(request, "customer_signup.html", {"location": Location.city_list()})
-
-
-# def customer_login(request):
-#     if request.user.is_authenticated:
-#         return redirect("/")
-#     else:
-#         if request.method == "POST":
-#             username = request.POST['username']
-#             password = request.POST['password']
-#             user = authenticate(username=username, password=password)
-#
-#             if user is not None:
-#                 user1 = Customer.objects.get(user=user)
-#                 if user1.type == "Customer":
-#                     login(request, user)
-#                     return redirect("/customer_homepage")
-#                 elif user.type == "Car Dealer":
-#                     return redirect("/customer_homepage")
-#
-#                 # else:
-#                 #     alert = True
-#                 #     # return render(request, "customer_login.html", {'alert': alert})
-#                 #     return redirect("/customer_homepage")
-#             else:
-#                 alert = True
-#                 return render(request, "customer_login.html", {'alert': alert})
-#     return render(request, "customer_login.html", {"location": Location.city_list()})
 
 
 def customer_login(request):
@@ -294,11 +269,13 @@ def order_details(request):
         rent = (int(car.rent)) * (int(days))
         car_dealer.earnings += rent
         car_dealer.save()
+        start_time = int(datetime.datetime.now(tz=timezone.utc).timestamp())
         try:
-            order = Order(car=car, car_dealer=car_dealer, user=user, rent=rent, days=days)
+            order = Order(car=car, car_dealer=car_dealer, user=user, rent=rent, days=days, start_time=start_time)
             order.save()
         except:
-            order = Order.objects.get(car=car, car_dealer=car_dealer, user=user, rent=rent, days=days)
+            order = Order.objects.get(car=car, car_dealer=car_dealer, user=user, rent=rent, days=days,
+                                      start_time=start_time)
         car.is_available = False
         car.save()
         order_notification()
@@ -344,6 +321,7 @@ def complete_order(request):
     order_id = request.POST['id']
     order = Order.objects.get(id=order_id)
     car = order.car
+    order.end_time = int(datetime.datetime.now(tz=timezone.utc).timestamp())
     order.is_complete = True
     order.save()
     car.is_available = True
@@ -360,12 +338,6 @@ def earnings(request):
     for order in orders:
         all_orders.append(order)
     return render(request, "earnings.html", {'amount': car_dealer.earnings, 'all_orders': all_orders})
-
-
-def payment(request):
-    user = request.user
-    username = Customer.objects.get(username=user)
-    contact = Customer.objects.get()
 
 
 def terms_and_conditions(request):
@@ -396,12 +368,6 @@ class CurrentLocationView(APIView):
         # vehicle = Car.objects.get(vehicle_number='KA34BN7755')
         return render(request=request, template_name='live_location.html',
                       context={"data": Tracking.last_location(device_id=device_id)})
-
-#
-# class CurrentLocationView(APIView):
-#     def get(self, request, tracking_id):
-#         return render(request=request, template_name='live_location.html',
-#                       context={"data": Car.last_location(tracking_id=tracking_id)})
 
 
 class LocationView(APIView):
