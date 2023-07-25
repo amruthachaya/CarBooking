@@ -1,15 +1,14 @@
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
 from rest_framework.response import Response
 
 from .models import *
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 import uuid
 from django.core.exceptions import ObjectDoesNotExist
+
 from rest_framework.views import APIView
-from  rest_framework import status
+from rest_framework import status
 
 from .ser import GpsTracker
 
@@ -152,7 +151,7 @@ def car_dealer_signup(request):
         alert = True
 
         return render(request, "car_dealer_signup.html", {"alert": alert})
-    return render(request, "car_dealer_signup.html")
+    return render(request, "car_dealer_signup.html", {"location": Location.city_list()})
 
 
 def car_dealer_login(request):
@@ -361,6 +360,12 @@ def earnings(request):
     return render(request, "earnings.html", {'amount': car_dealer.earnings, 'all_orders': all_orders})
 
 
+def payment(request):
+    user = request.user
+    username = Customer.objects.get(username=user)
+    contact = Customer.objects.get()
+
+
 def terms_and_conditions(request):
     return render(request, 'terms_and_conditions.html')
 
@@ -370,11 +375,6 @@ def terms_and_privacy(request):
 
 
 def about_us(request):
-    return render(request, "About_Us.html")
-
-def gps(request):
-    gps_data = dict(request.GET)
-    print(type(gps_data))
     return render(request, "About_Us.html")
 
 
@@ -391,6 +391,18 @@ class GpsView(APIView):
 
 class CurrentLocationView(APIView):
     def get(self, request, device_id):
+        # vehicle = Car.objects.get(vehicle_number='KA34BN7755')
+        return render(request=request, template_name='live_location.html',
+                      context={"data": Tracking.last_location(device_id=device_id)})
 
-        return render(request=request, template_name='live_location.html', context={"data": Tracking.last_location(device_id=device_id)})
+#
+# class CurrentLocationView(APIView):
+#     def get(self, request, tracking_id):
+#         return render(request=request, template_name='live_location.html',
+#                       context={"data": Car.last_location(tracking_id=tracking_id)})
 
+
+class LocationView(APIView):
+    def get(self, request, device_id):
+        return render(request=request, template_name='root_path.html',
+                      context={"data": Tracking.root_path(device_id=device_id)})

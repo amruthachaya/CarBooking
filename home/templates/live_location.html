@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -59,9 +60,9 @@
 
     map_init.fitBounds(featureGroup.getBounds())
 
+    marker.bindPopup("<b>Hello</b><br>This is Your current location.").openPopup();
+    circle.bindPopup("{{data.device_id}}");
     console.log("Your coordinate is: Lat: " + lat + " Long: " + long + " Accuracy: " + accuracy)
-
 </script>
 </body>
-
 </html>

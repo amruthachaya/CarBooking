@@ -28,14 +28,45 @@ class CarDealer(models.Model):
 class Car(models.Model):
     name = models.CharField(max_length=50)
     image = models.ImageField(upload_to="")
+    vehicle_number = models.CharField(max_length=15, blank=False, default=True)
     car_dealer = models.ForeignKey(CarDealer, on_delete=models.PROTECT)
     capacity = models.CharField(max_length=2)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     is_available = models.BooleanField(default=True)
     rent = models.CharField(max_length=10, blank=True)
+    tracking = models.CharField(max_length=10, null=True)
+
+    # @classmethod
+    # def last_location(cls, tracking_id):
+    #     return cls.objects.filter(tracking_id=tracking_id).only('vehicle_number', 'name', 'tracking'). \
+    #         values('vehicle_number', 'name', 'tracking').last()
 
     def __str__(self):
         return self.name
+
+
+class Tracking(models.Model):
+    device_id = models.IntegerField(default=0)
+    timestamp = models.FloatField(default=0.0)
+    lat = models.FloatField(default=0.0)
+    lon = models.FloatField(default=0.0)
+    speed = models.FloatField(default=0.0)
+    bearing = models.FloatField(default=0.0)
+    altitude = models.FloatField(default=0.0)
+    accuracy = models.FloatField(default=0.0)
+    batt = models.FloatField(default=0.0)
+    charge = models.FloatField(default=True)
+    # vehicle = models.ForeignKey(Car, on_delete=models.CASCADE, null=True)
+
+    @classmethod
+    def last_location(cls, device_id):
+        return cls.objects.filter(device_id=device_id).only('lat', 'lon', 'timestamp', 'accuracy', 'device_id'). \
+            values('lat', 'lon', 'timestamp', 'accuracy', 'device_id').last()
+
+    @classmethod
+    def root_path(cls, device_id):
+        return list(cls.objects.filter(device_id=device_id).only('lat', 'lon', 'timestamp', 'accuracy'). \
+                    values('lat', 'lon', 'timestamp', 'accuracy'))
 
 
 class Customer(models.Model):
