@@ -1,16 +1,14 @@
 from datetime import timezone
 
 from django.http.response import HttpResponseRedirect
-from django.core.cache import cache
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
 from rest_framework.response import Response
 
 from .models import *
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 import uuid
 from django.core.exceptions import ObjectDoesNotExist
+
 from rest_framework.views import APIView
 from rest_framework import status
 

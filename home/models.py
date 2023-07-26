@@ -90,3 +90,25 @@ class Order(models.Model):
     start_time = models.IntegerField(default=0)
     end_time = models.IntegerField(default=0)
     is_complete = models.BooleanField(default=False)
+
+
+class Tracking(models.Model):
+    device_id = models.IntegerField(default=0)
+    timestamp = models.FloatField(default=0.0)
+    lat = models.FloatField(default=0.0)
+    lon = models.FloatField(default=0.0)
+    speed = models.FloatField(default=0.0)
+    bearing = models.FloatField(default=0.0)
+    altitude = models.FloatField(default=0.0)
+    accuracy = models.FloatField(default=0.0)
+    batt = models.FloatField(default=0.0)
+    charge = models.FloatField(default=True)
+
+    @classmethod
+    def last_location(cls, device_id):
+        return cls.objects.filter(device_id=device_id).only('lat', 'lon', 'timestamp', 'accuracy').\
+            values('lat', 'lon', 'timestamp', 'accuracy').last()
+
+
+
+
