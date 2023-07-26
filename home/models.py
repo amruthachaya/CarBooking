@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.core.validators import *
 from django.contrib.auth.models import User
@@ -85,6 +87,8 @@ class Order(models.Model):
     car = models.ForeignKey(Car, on_delete=models.CASCADE)
     rent = models.CharField(max_length=10)
     days = models.CharField(max_length=3)
+    start_time = models.IntegerField(default=0)
+    end_time = models.IntegerField(default=0)
     is_complete = models.BooleanField(default=False)
 
 
