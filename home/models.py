@@ -58,7 +58,6 @@ class Tracking(models.Model):
     accuracy = models.FloatField(default=0.0)
     batt = models.FloatField(default=0.0)
     charge = models.FloatField(default=True)
-    # vehicle = models.ForeignKey(Car, on_delete=models.CASCADE, null=True)
 
     @classmethod
     def last_location(cls, device_id):
@@ -91,6 +90,20 @@ class Order(models.Model):
     end_time = models.IntegerField(default=0)
     is_complete = models.BooleanField(default=False)
 
+    @property
+    def rout_path(self):
+        if not self.is_complete:
+            return list(
+                Tracking.objects.filter(device_id=self.car.tracking, timestamp__gte=self.start_time).order_by('id').only('lat', 'lon',
+                                                                                                          'timestamp',
+                                                                                                          'accuracy',).values('lat', 'lon', 'timestamp', 'accuracy'))
+
+        return list(Tracking.objects.filter(device_id=self.car.tracking,
+                                            timestamp__range=[self.start_time, self.end_time]).order_by('id').only('lat', 'lon',
+                                                                                                    'timestamp',
+                                                                                                    'accuracy'). \
+                    values('lat', 'lon', 'timestamp', 'accuracy'))
+
 
 class Tracking(models.Model):
     device_id = models.IntegerField(default=0)
@@ -106,9 +119,5 @@ class Tracking(models.Model):
 
     @classmethod
     def last_location(cls, device_id):
-        return cls.objects.filter(device_id=device_id).only('lat', 'lon', 'timestamp', 'accuracy').\
+        return cls.objects.filter(device_id=device_id).only('lat', 'lon', 'timestamp', 'accuracy'). \
             values('lat', 'lon', 'timestamp', 'accuracy').last()
-
-
-
-

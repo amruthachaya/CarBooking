@@ -29,40 +29,53 @@
         integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
         crossorigin=""></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 <script>
   var map_init = L.map('map', {
-    center: [12.9137669, 77.6372593],
+    center: [12.9118327, 77.640001],
     zoom: 14
   });
   var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map_init);
 
-  var routeLayer = L.featureGroup().addTo(map_init);
+  var data = {{ data | safe }}
+  var centerCoordinates = map_init.getCenter();
+  var waypoints = [centerCoordinates, ...data.map(point => L.latLng(point.lat, point.lon))];
+
   L.Control.geocoder().addTo(map_init);
 
-  var data = [
-    { "lat": 12.9137669, "lon": 77.6372593 },
-    { "lat": 12.9137297, "lon": 77.6371832 },
-    { "lat": 12.92147, "lon": 77.661275 },
-    { "lat": 13.0698858, "lon": 77.7978509 }
-  ];
+  var polyline = L.polyline(waypoints, {color: 'blue'}).addTo(map_init);
 
-  var waypoints = data.map(point => L.latLng(point.lat, point.lon));
-
-  L.Routing.control({
-    waypoints: waypoints,
-  }).addTo(map_init);
-
-  var startPoint = L.marker(waypoints[0]).addTo(routeLayer);
-  var endPoint = L.marker(waypoints[waypoints.length - 1]).addTo(routeLayer);
-
-  var bounds = routeLayer.getBounds();
+  var bounds = L.latLngBounds(waypoints);
   map_init.fitBounds(bounds);
 
-  startPoint.bindPopup("<b>Starting Point</b>");
-  endPoint.bindPopup("<b>Ending Point</b>");
+  for (var i = 0; i < waypoints.length; i++) {
+    L.marker(waypoints[i]).addTo(map_init);
+  }
+
+  map_init.on('click', function(e) {
+    var clickedPoint = e.latlng;
+    var closestTimestamp = findClosestTimestamp(clickedPoint);
+    L.popup()
+      .setLatLng(clickedPoint)
+      .setContent('Timestamp: ' + closestTimestamp)
+      .openOn(map_init);
+  });
+
+  function findClosestTimestamp(clickedPoint) {
+    var closestTimestamp = null;
+    var closestDistance = Infinity;
+
+    for (var i = 0; i < waypoints.length; i++) {
+      var distance = clickedPoint.distanceTo(waypoints[i]);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestTimestamp = data[i].timestamp;
+      }
+    }
+
+    return closestTimestamp;
+  }
 
   console.log("Coordinates:", waypoints);
 </script>

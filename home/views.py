@@ -368,7 +368,12 @@ class CurrentLocationView(APIView):
                       context={"data": Tracking.last_location(device_id=device_id)})
 
 
-class LocationView(APIView):
-    def get(self, request, device_id):
+class RoutPathView(APIView):
+    def get(self, request, order_id):
         return render(request=request, template_name='root_path.html',
-                      context={"data": Tracking.root_path(device_id=device_id)})
+                      context={"data": Order.objects.get(id=order_id).rout_path})
+
+
+
+
+
