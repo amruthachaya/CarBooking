@@ -31,7 +31,7 @@
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script>
   var map_init = L.map('map', {
-    center: [12.9118327, 77.640001],
+    center: [12.9137669, 77.6372593],
     zoom: 14
   });
   var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -39,8 +39,7 @@
   }).addTo(map_init);
 
   var data = {{ data | safe }}
-  var centerCoordinates = map_init.getCenter();
-  var waypoints = [centerCoordinates, ...data.map(point => L.latLng(point.lat, point.lon))];
+  var waypoints = data.map(point => L.latLng(point.lat, point.lon));
 
   L.Control.geocoder().addTo(map_init);
 
@@ -53,28 +52,10 @@
     L.marker(waypoints[i]).addTo(map_init);
   }
 
-  map_init.on('click', function(e) {
-    var clickedPoint = e.latlng;
-    var closestTimestamp = findClosestTimestamp(clickedPoint);
-    L.popup()
-      .setLatLng(clickedPoint)
-      .setContent('Timestamp: ' + closestTimestamp)
-      .openOn(map_init);
-  });
-
   function findClosestTimestamp(clickedPoint) {
-    var closestTimestamp = null;
-    var closestDistance = Infinity;
+<!--    var closestTimestamp = null;-->
+<!--    var closestDistance = Infinity;-->
 
-    for (var i = 0; i < waypoints.length; i++) {
-      var distance = clickedPoint.distanceTo(waypoints[i]);
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestTimestamp = data[i].timestamp;
-      }
-    }
-
-    return closestTimestamp;
   }
 
   console.log("Coordinates:", waypoints);

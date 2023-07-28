@@ -304,14 +304,8 @@ def delete_order(request, myid):
 
 
 def all_orders(request):
-    username = request.user
-    user = User.objects.get(username=username)
-    car_dealer = CarDealer.objects.get(car_dealer=user)
-    orders = Order.objects.filter(car_dealer=car_dealer)
-    all_orders = []
-    for order in orders:
-        if not order.is_complete:
-            all_orders.append(order)
+    all_orders = Order.all_orders(request.user.id)
+    print(request.user.id)
     return render(request, "all_orders.html", {'all_orders': all_orders})
 
 
@@ -372,8 +366,3 @@ class RoutPathView(APIView):
     def get(self, request, order_id):
         return render(request=request, template_name='root_path.html',
                       context={"data": Order.objects.get(id=order_id).rout_path})
-
-
-
-
-

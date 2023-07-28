@@ -104,6 +104,15 @@ class Order(models.Model):
                                                                                                     'accuracy'). \
                     values('lat', 'lon', 'timestamp', 'accuracy'))
 
+    @classmethod
+    def all_orders(cls, user):
+        return cls.objects.filter(car_dealer__car_dealer=user).order_by('is_complete', '-id').select_related('car_dealer', 'user', 'car')
+
+    # @classmethod
+    # def past_orders(cls, user):
+    #     return cls.objects.filter(car_dealer__user=user).order_by('is_complete', '-id').select_related(
+    #         'car_dealer', 'user', 'car')
+
 
 class Tracking(models.Model):
     device_id = models.IntegerField(default=0)

@@ -35,10 +35,12 @@
                 <tr>
                     <th>Customer Name</th>
                     <th>Car Name</th>
+                    <th>Vehicle Number</th>
                     <th>Image</th>
                     <th>Days</th>
                     <th>Rent</th>
                     <th>Capacity</th>
+                    <th>Device Id</th>
                     <th>GPS</th>
                     <th>Action</th>
                 </tr>
@@ -46,31 +48,34 @@
                 <tr>
                     <td>{{order.user.get_full_name}}</td>
                     <td>{{order.car.name}}</td>
+                    <td>{{order.car.vehicle_number}}</td>
                     <td><img src="{{order.car.image.url}}" alt="" width="100px" height="100px"></td>
                     <td>{{order.days}}</td>
                     <td>₹ {{order.rent}}</td>
                     <td>{{order.car.capacity}}</td>
-                    <td><a href ="/rout_path/{{order.id}}" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
-                    <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/><path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                    <td>{{order.car.tracking}}</td>
+                    <td><a href ="/rout_path/{{order.id}}" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pin-map-fill" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M3.1 11.2a.5.5 0 0 1 .4-.2H6a.5.5 0 0 1 0 1H3.75L1.5 15h13l-2.25-3H10a.5.5 0 0 1 0-1h2.5a.5.5 0 0 1 .4.2l3 4a.5.5 0 0 1-.4.8H.5a.5.5 0 0 1-.4-.8l3-4z"/>
+  <path fill-rule="evenodd" d="M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999z"/>
+                     </svg>
                     </a></svg></td>
                    <td>
   <form action="/complete_order/" method="post" id="completeForm">
     {% csrf_token %}
     <input type="hidden" name="id" value="{{ order.id }}">
-    <button class="btn btn-primary" type="submit" id="completeButton">Complete</button>
+      {% if order.is_complete %}
+      <button class="btn btn-primary" style="color:black" type="submit" id="completeButton" disabled>
+        Completed </button>
+      {% else %}
+      <button class="btn btn-primary" type="submit" id="completeButton">
+        Complete </button>
+      {% endif %}
+
   </form>
 </td>
 
 <script>
-  const completeButton = document.getElementById('completeButton');
-  const completeForm = document.getElementById('completeForm');
 
-  completeButton.addEventListener('click', function (event) {
-    event.preventDefault(); // Prevent the form submission
-
-    completeButton.innerText = 'Completed'; //complete button is disabled
-    completeButton.disabled = true;
-  });
 </script>
                 </tr>
                 {% endfor %}
