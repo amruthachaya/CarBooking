@@ -1,5 +1,6 @@
 from datetime import timezone
 
+import razorpay
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from rest_framework.response import Response
@@ -167,6 +168,7 @@ def signout(request):
 def add_car(request):
     if request.method == "POST":
         car_name = request.POST['car_name']
+        vehicle_number = request.POST['vehicle_number']
         city = request.POST['city']
         image = request.FILES['image']
         obj = S3(directory='car', file=image)()
@@ -174,18 +176,19 @@ def add_car(request):
         print(S3().media_storage.url(obj))
         capacity = request.POST['capacity']
         rent = request.POST['rent']
+        tracking = request.POST['tracking']
         car_dealer = CarDealer.objects.get(car_dealer=request.user)
         try:
             location = Location.objects.get(city=city)
         except:
             location = None
         if location is not None:
-            car = Car(name=car_name, car_dealer=car_dealer, location=location, capacity=capacity, image=image,
-                      rent=rent)
+            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=image,
+                      rent=rent, tracking=tracking)
         else:
             location = Location(city=city)
-            car = Car(name=car_name, car_dealer=car_dealer, location=location, capacity=capacity, image=image,
-                      rent=rent)
+            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=image,
+                      rent=rent, tracking=tracking)
         car.save()
         alert = True
         return render(request, "add_car.html", {'alert': alert})
@@ -202,13 +205,18 @@ def edit_car(request, iid):
     car = Car.objects.get(id=iid)
     if request.method == "POST":
         car_name = request.POST['car_name']
+        vehicle_number = request.POST['vehicle_number']
         city = request.POST['city']
         capacity = request.POST['capacity']
         rent = request.POST['rent']
+        device_id = request.POST['device_id']
+
         car.name = car_name
+        car.vehicle_number = vehicle_number
         car.city = city
         car.capacity = capacity
         car.rent = rent
+        car.tracking = device_id
         car.save()
 
         try:
@@ -367,3 +375,9 @@ class RoutPathView(APIView):
     def get(self, request, order_id):
         return render(request=request, template_name='root_path.html',
                       context={"data": Order.objects.get(id=order_id).rout_path})
+
+
+def create_link(order_id):
+    order_id = Order.objects.get(id=order_id)
+    return Response(order_id, payment)
+
