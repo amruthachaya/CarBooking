@@ -4,6 +4,7 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from rest_framework.response import Response
 
+from CarRental.AWS import S3
 from .models import *
 from django.contrib.auth import authenticate, login, logout
 import uuid
@@ -168,8 +169,9 @@ def add_car(request):
         car_name = request.POST['car_name']
         city = request.POST['city']
         image = request.FILES['image']
-        image_uuid = uuid.uuid4().int
-        print(image_uuid)
+        obj = S3(directory='car', file=image)()
+        print(obj)
+        print(S3().media_storage.url(obj))
         capacity = request.POST['capacity']
         rent = request.POST['rent']
         car_dealer = CarDealer.objects.get(car_dealer=request.user)
@@ -203,7 +205,6 @@ def edit_car(request, iid):
         city = request.POST['city']
         capacity = request.POST['capacity']
         rent = request.POST['rent']
-
         car.name = car_name
         car.city = city
         car.capacity = capacity
