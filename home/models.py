@@ -5,6 +5,8 @@ from django.db import models
 from django.core.validators import *
 from django.contrib.auth.models import User
 
+from CarRental.AWS import S3
+
 
 class Location(models.Model):
     city = models.CharField(max_length=50)
@@ -46,6 +48,12 @@ class Car(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def car_image_url(self):
+        if self.image:
+            return S3().media_storage.url(self.image)
+        return None
 
 
 class Tracking(models.Model):

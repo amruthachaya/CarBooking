@@ -171,7 +171,7 @@ def add_car(request):
         vehicle_number = request.POST['vehicle_number']
         city = request.POST['city']
         image = request.FILES['image']
-        obj = S3(directory='car', file=image)()
+        obj = S3()(directory='car', file=image)
         print(obj)
         print(S3().media_storage.url(obj))
         capacity = request.POST['capacity']
