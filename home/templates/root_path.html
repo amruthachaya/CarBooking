@@ -45,12 +45,15 @@
 
   var polyline = L.polyline(waypoints, {color: 'blue'}).addTo(map_init);
 
+
+
   var bounds = L.latLngBounds(waypoints);
   map_init.fitBounds(bounds);
 
   for (var i = 0; i < waypoints.length; i++) {
     L.marker(waypoints[i]).addTo(map_init);
   }
+
 
   function findClosestTimestamp(clickedPoint) {
 <!--    var closestTimestamp = null;-->

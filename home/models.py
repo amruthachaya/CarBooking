@@ -1,5 +1,6 @@
 import datetime
 
+import razorpay
 from django.db import models
 from django.core.validators import *
 from django.contrib.auth.models import User
@@ -90,6 +91,7 @@ class Order(models.Model):
     end_time = models.IntegerField(default=0)
     is_complete = models.BooleanField(default=False)
 
+
     @property
     def rout_path(self):
         if not self.is_complete:
@@ -108,10 +110,31 @@ class Order(models.Model):
     def all_orders(cls, user):
         return cls.objects.filter(car_dealer__car_dealer=user).order_by('is_complete', '-id').select_related('car_dealer', 'user', 'car')
 
-    # @classmethod
-    # def past_orders(cls, user):
-    #     return cls.objects.filter(car_dealer__user=user).order_by('is_complete', '-id').select_related(
-    #         'car_dealer', 'user', 'car')
+
+@classmethod
+def make_payment(cls, order_id):
+    try:
+        client = razorpay.Client(auth=("rzp_test_pcJUI2h54atKS2", "zcn5CaE2muoStTh5Q6QBmqM0"))
+        order = cls.objects.get(id=order_id)
+
+        payment = client.payment_link.create({'amount': order.rent, 'currency': 'INR', "accept_partial": "true",
+                                          "first_min_partial_amount": 0, "description": "For Testing",
+                                          "customer": {"name": order.user,
+                                                       "email": order.user.email,
+                                                       "contact": order.user.phone
+                                                       },
+                                          "notify":
+                                              {
+                                                  "sms": True,
+                                                  "email": True
+                                              }
+
+                                          })
+        return payment['short_url']
+    except cls.DoesNotExist:
+        return None
+
+
 
 
 class Tracking(models.Model):
