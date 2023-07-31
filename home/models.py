@@ -30,7 +30,7 @@ class CarDealer(models.Model):
 
 class Car(models.Model):
     name = models.CharField(max_length=50)
-    image = models.CharField(max_length=200, null=True, blank=t)
+    image = models.CharField(max_length=200, null=True, blank=True)
     vehicle_number = models.CharField(max_length=15, blank=False, default=True)
     car_dealer = models.ForeignKey(CarDealer, on_delete=models.PROTECT)
     capacity = models.CharField(max_length=2)
