@@ -1,9 +1,11 @@
 from datetime import timezone
 
+import razorpay
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from rest_framework.response import Response
 
+from CarRental.AWS import S3
 from .models import *
 from django.contrib.auth import authenticate, login, logout
 import uuid
@@ -166,24 +168,27 @@ def signout(request):
 def add_car(request):
     if request.method == "POST":
         car_name = request.POST['car_name']
+        vehicle_number = request.POST['vehicle_number']
         city = request.POST['city']
         image = request.FILES['image']
-        image_uuid = uuid.uuid4().int
-        print(image_uuid)
+        obj = S3()(directory='car', file=image)
+        print(obj)
+        print(S3().media_storage.url(obj))
         capacity = request.POST['capacity']
         rent = request.POST['rent']
+        tracking = request.POST['tracking']
         car_dealer = CarDealer.objects.get(car_dealer=request.user)
         try:
             location = Location.objects.get(city=city)
         except:
             location = None
         if location is not None:
-            car = Car(name=car_name, car_dealer=car_dealer, location=location, capacity=capacity, image=image,
-                      rent=rent)
+            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=obj,
+                      rent=rent, tracking=tracking)
         else:
             location = Location(city=city)
-            car = Car(name=car_name, car_dealer=car_dealer, location=location, capacity=capacity, image=image,
-                      rent=rent)
+            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=obj,
+                      rent=rent, tracking=tracking)
         car.save()
         alert = True
         return render(request, "add_car.html", {'alert': alert})
@@ -200,19 +205,24 @@ def edit_car(request, iid):
     car = Car.objects.get(id=iid)
     if request.method == "POST":
         car_name = request.POST['car_name']
+        vehicle_number = request.POST['vehicle_number']
         city = request.POST['city']
         capacity = request.POST['capacity']
         rent = request.POST['rent']
+        device_id = request.POST['device_id']
 
         car.name = car_name
+        car.vehicle_number = vehicle_number
         car.city = city
         car.capacity = capacity
         car.rent = rent
+        car.tracking = device_id
         car.save()
 
         try:
             image = request.FILES['image']
-            car.image = image
+            obj = S3()(directory='car', file=image)
+            car.image = obj
             car.save()
         except:
             pass
@@ -242,7 +252,7 @@ def search_results(request):
         cars = Car.objects.filter(location=a)
         for car in cars:
             if car.is_available:
-                vehicle_dictionary = {'name': car.name, 'id': car.id, 'image': car.image.url, 'city': car.location.city,
+                vehicle_dictionary = {'name': car.name, 'id': car.id, 'image': car.url, 'city': car.location.city,
                                       'capacity': car.capacity}
                 vehicles_list.append(vehicle_dictionary)
     request.session['vehicles_list'] = vehicles_list
@@ -366,3 +376,9 @@ class RoutPathView(APIView):
     def get(self, request, order_id):
         return render(request=request, template_name='root_path.html',
                       context={"data": Order.objects.get(id=order_id).rout_path})
+
+
+def create_link(order_id):
+    order_id = Order.objects.get(id=order_id)
+    return Response(order_id)
+

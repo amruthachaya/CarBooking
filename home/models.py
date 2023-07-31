@@ -1,8 +1,11 @@
 import datetime
 
+import razorpay
 from django.db import models
 from django.core.validators import *
 from django.contrib.auth.models import User
+
+from CarRental.AWS import S3
 
 
 class Location(models.Model):
@@ -29,7 +32,7 @@ class CarDealer(models.Model):
 
 class Car(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to="")
+    image = models.CharField(max_length=200, null=True, blank=True)
     vehicle_number = models.CharField(max_length=15, blank=False, default=True)
     car_dealer = models.ForeignKey(CarDealer, on_delete=models.PROTECT)
     capacity = models.CharField(max_length=2)
@@ -45,6 +48,12 @@ class Car(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def url(self):
+        if self.image:
+            return S3().media_storage.url(self.image)
+        return None
 
 
 class Tracking(models.Model):
@@ -94,14 +103,16 @@ class Order(models.Model):
     def rout_path(self):
         if not self.is_complete:
             return list(
-                Tracking.objects.filter(device_id=self.car.tracking, timestamp__gte=self.start_time).order_by('id').only('lat', 'lon',
-                                                                                                          'timestamp',
-                                                                                                          'accuracy',).values('lat', 'lon', 'timestamp', 'accuracy'))
+                Tracking.objects.filter(device_id=self.car.tracking, timestamp__gte=self.start_time).order_by(
+                    'id').only('lat', 'lon',
+                               'timestamp',
+                               'accuracy', ).values('lat', 'lon', 'timestamp', 'accuracy'))
 
         return list(Tracking.objects.filter(device_id=self.car.tracking,
-                                            timestamp__range=[self.start_time, self.end_time]).order_by('id').only('lat', 'lon',
-                                                                                                    'timestamp',
-                                                                                                    'accuracy'). \
+                                            timestamp__range=[self.start_time, self.end_time]).order_by('id').only(
+            'lat', 'lon',
+            'timestamp',
+            'accuracy'). \
                     values('lat', 'lon', 'timestamp', 'accuracy'))
 
     @classmethod
@@ -112,6 +123,24 @@ class Order(models.Model):
     # def past_orders(cls, user):
     #     return cls.objects.filter(car_dealer__user=user).order_by('is_complete', '-id').select_related(
     #         'car_dealer', 'user', 'car')
+
+    @classmethod
+    def make_payment(cls, self, order_id):
+        client = razorpay.Client(auth=("rzp_test_pcJUI2h54atKS2", "zcn5CaE2muoStTh5Q6QBmqM0"))
+        payment = client.payment_link.create({'amount': 10000, 'currency': 'INR', "accept_partial": "true",
+                                              "first_min_partial_amount": 200, "description": "For Testing",
+                                              "customer": {"name": "Amrutha",
+                                                           "email": "amruthachaya4381@gmail.com",
+                                                           "contact": "9148169281"
+                                                           },
+                                              "notify":
+                                                  {
+                                                      "sms": True,
+                                                      "email": True
+                                                  }
+
+                                              })
+        return cls.objects.filter(order_id=order_id).values('username', 'email')
 
 
 class Tracking(models.Model):
