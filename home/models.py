@@ -50,7 +50,7 @@ class Car(models.Model):
         return self.name
 
     @property
-    def car_image_url(self):
+    def url(self):
         if self.image:
             return S3().media_storage.url(self.image)
         return None

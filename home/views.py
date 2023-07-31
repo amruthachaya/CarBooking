@@ -183,11 +183,11 @@ def add_car(request):
         except:
             location = None
         if location is not None:
-            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=image,
+            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=obj,
                       rent=rent, tracking=tracking)
         else:
             location = Location(city=city)
-            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=image,
+            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=obj,
                       rent=rent, tracking=tracking)
         car.save()
         alert = True
@@ -221,7 +221,8 @@ def edit_car(request, iid):
 
         try:
             image = request.FILES['image']
-            car.image = image
+            obj = S3()(directory='car', file=image)
+            car.image = obj
             car.save()
         except:
             pass
@@ -251,7 +252,7 @@ def search_results(request):
         cars = Car.objects.filter(location=a)
         for car in cars:
             if car.is_available:
-                vehicle_dictionary = {'name': car.name, 'id': car.id, 'image': car.image.url, 'city': car.location.city,
+                vehicle_dictionary = {'name': car.name, 'id': car.id, 'image': car.url, 'city': car.location.city,
                                       'capacity': car.capacity}
                 vehicles_list.append(vehicle_dictionary)
     request.session['vehicles_list'] = vehicles_list
@@ -379,5 +380,5 @@ class RoutPathView(APIView):
 
 def create_link(order_id):
     order_id = Order.objects.get(id=order_id)
-    return Response(order_id, payment)
+    return Response(order_id)
 
