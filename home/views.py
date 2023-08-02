@@ -183,11 +183,13 @@ def add_car(request):
         except:
             location = None
         if location is not None:
-            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=obj,
+            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location,
+                      capacity=capacity, image=obj,
                       rent=rent, tracking=tracking)
         else:
             location = Location(city=city)
-            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=obj,
+            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location,
+                      capacity=capacity, image=obj,
                       rent=rent, tracking=tracking)
         car.save()
         alert = True
@@ -379,6 +381,4 @@ class RoutPathView(APIView):
 
 
 def create_link(order_id):
-    order_id = Order.objects.get(id=order_id)
-    return Response(order_id)
-
+    return Response(context={"data": Order.objects.get(id=order_id).make_payment})
