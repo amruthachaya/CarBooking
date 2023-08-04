@@ -9,7 +9,7 @@
     {% csrf_token %}
     <b>Price : ₹ {{cost_per_day}} per day</b><br><br>
     <lable>How many days?</lable> 
-    <input type="text" placeholder="2" name="days"><br><br>
+    <input type="text" placeholder="2" name="days" required><br><br>
     <button class="btn" style="color: white; background-color: blue;" type="submit">Confirm</button><br><br>
     <input type="hidden" value="{{car.id}}" name="id">
     <br><br>

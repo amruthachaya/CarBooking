@@ -98,6 +98,8 @@ class Order(models.Model):
     start_time = models.IntegerField(default=0)
     end_time = models.IntegerField(default=0)
     is_complete = models.BooleanField(default=False)
+    payment_id = models.CharField(max_length=100, null=True, blank=True)
+    status = models.CharField(max_length=30, default='Pending')
 
     @property
     def rout_path(self):
@@ -129,28 +131,32 @@ class Order(models.Model):
     def make_payment(cls, order_id):
         client = razorpay.Client(auth=("rzp_test_pcJUI2h54atKS2", "zcn5CaE2muoStTh5Q6QBmqM0"))
         order = cls.objects.get(id=order_id)
-        customer = cls.objects.get(order=order)
+        customer = Customer.objects.get(user=order.user)
 
-        payment = client.payment_link.create({'amount': int(order.rent) * 100, 'currency': 'INR', "accept_partial": "true",
-                                              "first_min_partial_amount": 0, "description": "For Testing",
-                                              "customer": {"name": customer.user.first_name,
-                                                           "email": customer.user.email,
-                                                           "contact": customer.phone
-                                                           },
-                                              "notify":
-                                                  {
-                                                      "sms": True,
-                                                      "email": True
-                                                  },
+        payment = client.payment_link.create(
+            {'amount': int(order.rent) * 100, 'currency': 'INR', "accept_partial": "true",
+             "first_min_partial_amount": 0, "description": "For Testing",
+             "customer": {"name": customer.user.first_name,
+                          "email": customer.user.email,
+                          "contact": customer.phone
+                          },
+             "notify":
+                 {
+                     "sms": True,
+                     "email": True
+                 },
 
-                                              "reminder_enable": True,
-                                              "notes": {
-                                                  "policy_name": "HireCar"
-                                              },
-                                              "callback_url": "https://example-callback-url.com/",
-                                              "callback_method": "get"
+             "reminder_enable": True,
+             "notes": {
+                 "policy_name": "HireCar"
+             },
+             "callback_url": "http://127.0.0.1:8000/past_orders/",
+             "callback_method": "get"
 
-                                              })
+             })
+        order.payment_id = payment['id']
+        order.save()
+        # print(payment)
         return payment['short_url']
 
 
