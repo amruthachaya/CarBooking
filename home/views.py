@@ -3,6 +3,7 @@ from datetime import timezone
 import razorpay
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect
+from django.views.decorators.cache import cache_control
 from rest_framework.response import Response
 
 from CarRental.AWS import S3
@@ -67,6 +68,7 @@ def customer_signup(request):
     return render(request, "customer_signup.html", {"location": Location.city_list()})
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def customer_login(request):
     if request.user.is_authenticated:
         return redirect("/")
@@ -82,6 +84,7 @@ def customer_login(request):
                     if user1.type == "Customer":
                         login(request, user)
                         return redirect("/customer_homepage")
+
                     elif user1.type == "Car Dealer":
                         alert = True
                         return render(request, "customer_login.html", {'alert': alert})
@@ -183,11 +186,14 @@ def add_car(request):
         except:
             location = None
         if location is not None:
-            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=obj,
+            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location,
+                      capacity=capacity, image=obj,
                       rent=rent, tracking=tracking)
+            car.save()
         else:
             location = Location(city=city)
-            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=obj,
+            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location,
+                      capacity=capacity, image=obj,
                       rent=rent, tracking=tracking)
         car.save()
         alert = True
@@ -378,7 +384,22 @@ class RoutPathView(APIView):
                       context={"data": Order.objects.get(id=order_id).rout_path})
 
 
-def create_link(order_id):
-    order_id = Order.objects.get(id=order_id)
-    return Response(order_id)
+def create_link(request, order_id):
+    payment_url = Order.make_payment(order_id)
+    return redirect(payment_url)
 
+
+class payment_status(APIView):
+    def post(self, request):
+        try:
+            data = request.data or {}
+            if data.get('entity') == 'event':
+                print(data['payload']['payment']['entity']['id'])
+                order = Order.objects.get(payment_id=data['payload']['payment']['entity']['id'])
+                order.status = data['payload']['payment']['entity']['status']
+                order.save()
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response("")
+        except:
+            return Response("Not found", status=status.HTTP_400_BAD_REQUEST)

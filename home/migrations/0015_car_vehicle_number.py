@@ -10,9 +10,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='car',
-            name='vehicle_number',
-            field=models.CharField(default=True, max_length=15),
-        ),
     ]
