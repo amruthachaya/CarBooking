@@ -28,5 +28,7 @@ urlpatterns = [
     path("current_location/<int:device_id>/", views.CurrentLocationView.as_view(), name='gps'),
     path("rout_path/<int:order_id>/", views.RoutPathView.as_view(), name='gps'),
     path("payment/status/", views.payment_status.as_view(), name="payment status"),
-    path("payment/<order_id>/", views.create_link, name="payment")
+    path("payment/<order_id>/", views.create_link, name="payment"),
+    path("sms/", views.send_sms, name="sms"),
+    path("Payment_Success/", views.Payment_success, name="Payment Success")
 ]

@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 import razorpay
 from django.db import models
@@ -132,7 +133,7 @@ class Order(models.Model):
         client = razorpay.Client(auth=("rzp_test_pcJUI2h54atKS2", "zcn5CaE2muoStTh5Q6QBmqM0"))
         order = cls.objects.get(id=order_id)
         customer = Customer.objects.get(user=order.user)
-
+        ref_id = uuid.uuid4().__str__()
         payment = client.payment_link.create(
             {'amount': int(order.rent) * 100, 'currency': 'INR', "accept_partial": "true",
              "first_min_partial_amount": 0, "description": "For Testing",
@@ -145,18 +146,21 @@ class Order(models.Model):
                      "sms": True,
                      "email": True
                  },
-
              "reminder_enable": True,
              "notes": {
                  "policy_name": "HireCar"
              },
-             "callback_url": "http://127.0.0.1:8000/past_orders/",
-             "callback_method": "get"
 
-             })
-        order.payment_id = payment['id']
+             "reference_id": ref_id,
+             "callback_url": "http://127.0.0.1:8000/Payment_Success/",
+             "callback_method": "get"
+             },
+        )
+
+        order.payment_id = ref_id
+        order.status = payment['status']
         order.save()
-        # print(payment)
+        print(payment)
         return payment['short_url']
 
 

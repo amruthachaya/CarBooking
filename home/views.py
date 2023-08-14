@@ -14,6 +14,9 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework.views import APIView
 from rest_framework import status
+from django.http import HttpResponse
+from twilio.rest import Client
+from django.conf import settings
 
 from .ser import GpsTracker
 
@@ -360,6 +363,10 @@ def about_us(request):
     return render(request, "About_Us.html")
 
 
+def Payment_success(request):
+    return render(request, "test.html")
+
+
 class GpsView(APIView):
     def post(self, request):
         gps_data = request.query_params.dict()
@@ -386,6 +393,27 @@ class RoutPathView(APIView):
 
 def create_link(request, order_id):
     payment_url = Order.make_payment(order_id)
+    payment_is_successful = Order.make_payment(order_id)
+
+    if payment_is_successful:
+        account_sid = 'AC7712ab00aec629716f5f5fd0a777aef1'
+        auth_token = 'ee84ebc377e578f16b2dc4fb564f9c0f'
+
+        client = Client(account_sid, auth_token)
+
+        from_number = '+12187520663'
+
+        to_number = '+919148169281'
+
+        message_body = 'Thank you for the payment! Your order has been successfully processed.'
+
+        message = client.messages.create(
+            body=message_body,
+            from_=from_number,
+            to=to_number
+        )
+
+    print(message.sid)
     return redirect(payment_url)
 
 
@@ -394,12 +422,37 @@ class payment_status(APIView):
         try:
             data = request.data or {}
             if data.get('entity') == 'event':
-                print(data['payload']['payment']['entity']['id'])
-                order = Order.objects.get(payment_id=data['payload']['payment']['entity']['id'])
+                ref_id = data['payload']['payment_link']['entity']['reference_id']
+                # print(ref_id)
+                order = Order.objects.get(payment_id=ref_id)
                 order.status = data['payload']['payment']['entity']['status']
+                # print(order.status)
                 order.save()
             else:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-            return Response("")
-        except:
-            return Response("Not found", status=status.HTTP_400_BAD_REQUEST)
+                return Response("Entity is not event", status=status.HTTP_400_BAD_REQUEST)
+            return Response("Order Confirmed")
+        except Order.DoesNotExist:
+            return Response("Id not found", status=status.HTTP_404_NOT_FOUND)
+
+
+def send_sms(request):
+    account_sid = 'AC7712ab00aec629716f5f5fd0a777aef1'
+    auth_token = 'ee84ebc377e578f16b2dc4fb564f9c0f'
+
+    client = Client(account_sid, auth_token)
+
+    from_number = '+12187520663'
+
+    to_number = '+919148169281'
+
+    message_body = 'Hello from Twilio and Django!'
+
+    message = client.messages.create(
+        body=message_body,
+        from_=from_number,
+        to=to_number
+    )
+
+    print(message.sid)
+
+    return HttpResponse("SMS sent successfully.")

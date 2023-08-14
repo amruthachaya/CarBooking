@@ -26,3 +26,4 @@ djangorestframework~=3.14.0
 django-storages
 boto3
 razorpay~=1.3.0
+twilio~=8.5.0

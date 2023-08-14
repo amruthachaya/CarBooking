@@ -6,8 +6,6 @@ from credential import DB, aws
 
 load_dotenv(override=True)
 
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -122,6 +120,10 @@ STORAGES = {"default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
 AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_S3_REGION_NAME = "ap-south-1"
 
+# twilio settings
+TWILIO_ACCOUNT_SID = 'AC7712ab00aec629716f5f5fd0a777aef1'
+TWILIO_AUTH_TOKEN = 'ee84ebc377e578f16b2dc4fb564f9c0f'
+TWILIO_PHONE_NUMBER = '+12187520663'
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
