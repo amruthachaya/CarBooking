@@ -18,12 +18,12 @@
             </div>
 
             <div class="form-group col-md-6">
-                <label><i style="font-weight: bold;">Car Image &nbsp;&nbsp;&nbsp;<a href="/media/{{car.image}}/">View Image</a></i></label>
+                <label><i style="font-weight: bold;">Car Image &nbsp;&nbsp;&nbsp;<a href="/media/{{car.url}}/">View Image</a></i></label>
                 <input type="file" class="form-control" name="image">
             </div>
                 <div class="form-group col-md-6">
                 <label><i style="font-weight: bold;">Car Number</i></label>
-                <input type="text" class="form-control" name="Vehicle Number" value="{{car.vehicle_number}}" required>
+                <input type="text" class="form-control" name="vehicle_number" value="{{car.vehicle_number}}" required>
             </div>
         </div>
 
@@ -38,6 +38,12 @@
             <div class="form-group col-md-12">
                 <label><i style="font-weight: bold;">Rent (per day)</i></label>
                 <input type="number" class="form-control" name="rent" value="{{car.rent}}" required>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="form-group col-md-12">
+                <label><i style="font-weight: bold;">Device_Id</i></label>
+                <input type="number" class="form-control" name="device_id" value="{{car.tracking}}" required>
             </div>
         </div>
     

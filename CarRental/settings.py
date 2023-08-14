@@ -117,13 +117,10 @@ AUTH_PASSWORD_VALIDATORS = [
 AWS_ACCESS_KEY_ID = aws['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = aws['AWS_SECRET_ACCESS_KEY']
 AWS_STORAGE_BUCKET_NAME = aws['AWS_STORAGE_BUCKET_NAME']
-
-# # Your app endpoint
-# AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')
-#
-# # Only public read for now
-# AWS_QUERYSTRING_AUTH = False
-# AWS_DEFAULT_ACL = 'public-read'
+STORAGES = {"default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
+            "staticfiles": {"BACKEND": "storages.backends.s3boto3.S3ManifestStaticStorage"}}
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_S3_REGION_NAME = "ap-south-1"
 
 
 # Internationalization

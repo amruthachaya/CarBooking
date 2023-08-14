@@ -1,5 +1,5 @@
 {% extends 'car_dealer_navbar.html' %}
-{% block title %} Car Dealer Login {% endblock %}
+{% block title %} All Cars {% endblock %}
 {% block css %}
 <style>
     h1 {
@@ -45,7 +45,7 @@
                 {% for car in cars %}
                 <tr>
                     <td>{{car.name}}</td>
-                    <td><img src="{{car.image.url}}" alt="" width="100px" height="100px"></td>
+                    <td><img src="{{car.url}}" alt="" width="100px" height="100px"></td>
                     <td>{{car.location.city}}</td>
                     <td>{{car.capacity}}</td>
 <!--                    <td><a href="/live_location/">{{car.tracking}}</a></td>-->
