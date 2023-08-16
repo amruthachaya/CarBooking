@@ -1,17 +1,21 @@
 {% extends 'customer_navbar.html' %}
-{% block title %} Customer Login {% endblock %}
+{% block title %} Order Confirmation {% endblock %}
 {% block css %}
 {% endblock %}
 {% block body %}
 <div class="container mt-4">
-      <h3><b>Order Completed</b></h3>
-      <b>Your Vehicle Order Has Been Processed!</b><br><br>
-      <b>Total Rent :</b> ₹ {{order.rent}}<br><br>
-      <b>Vehicle :</b> {{order.car.name}}<br><br>
-      <b>Duration :</b> {{order.days}} days<br><br>
-      <b>Car-Dealer :</b> {{order.car_dealer.car_dealer.first_name}} {{order.car_dealer.car_dealer.last_name}}<br><br>
-      <b>Car-Dealer's Contact:</b> {{order.car_dealer.phone}}<br><br>
-      </div>
-      </div>
+    <h3><b>Order Status</b></h3>
+    <b>Your Vehicle Order Has Been Processed!</b><br><br>
+    <b>Order Id :</b>{{order.id}}<br><br>
+    <b>Total Rent :</b> ₹ {{order.rent}}<br><br>
+    <b>Vehicle :</b> {{order.car.name}}<br><br>
+    <b>Duration :</b> {{order.days}} days<br><br>
+    <b>Fuel Type :</b> {{order.car.fuel_type}}<br><br>
+    <b>Car-Dealer :</b> {{order.car_dealer.car_dealer.first_name}} {{order.car_dealer.car_dealer.last_name}}<br><br>
+    <b>Car-Dealer's Contact:</b> {{order.car_dealer.phone}}<br><br>
+    <button class="btn" style="color:blue; background-color:skyblue;" type="submit">
+        <a href="/payment/{{order.id}}/"><b>Pay Now</b></a>
+    </button><br><br>
 </div>
+
 {% endblock %}

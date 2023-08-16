@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 import razorpay
 from django.db import models
@@ -40,6 +41,7 @@ class Car(models.Model):
     is_available = models.BooleanField(default=True)
     rent = models.CharField(max_length=10, blank=True)
     tracking = models.CharField(max_length=10, null=True)
+    fuel_type = models.CharField(max_length=10, null=True, blank=True, default='Petrol')
 
     # @classmethod
     # def last_location(cls, tracking_id):
@@ -98,6 +100,9 @@ class Order(models.Model):
     start_time = models.IntegerField(default=0)
     end_time = models.IntegerField(default=0)
     is_complete = models.BooleanField(default=False)
+    payment_id = models.CharField(max_length=100, null=True, blank=True)
+    status = models.CharField(max_length=30, default='Pending')
+    fuel_type = models.CharField(max_length=10, default='Petrol')
 
     @property
     def rout_path(self):
@@ -117,7 +122,8 @@ class Order(models.Model):
 
     @classmethod
     def all_orders(cls, user):
-        return cls.objects.filter(car_dealer__car_dealer=user).order_by('is_complete', '-id').select_related('car_dealer', 'user', 'car')
+        return cls.objects.filter(car_dealer__car_dealer=user).order_by('is_complete', '-id').select_related(
+            'car_dealer', 'user', 'car')
 
     # @classmethod
     # def past_orders(cls, user):
@@ -125,22 +131,39 @@ class Order(models.Model):
     #         'car_dealer', 'user', 'car')
 
     @classmethod
-    def make_payment(cls, self, order_id):
+    def make_payment(cls, order_id):
         client = razorpay.Client(auth=("rzp_test_pcJUI2h54atKS2", "zcn5CaE2muoStTh5Q6QBmqM0"))
-        payment = client.payment_link.create({'amount': 10000, 'currency': 'INR', "accept_partial": "true",
-                                              "first_min_partial_amount": 200, "description": "For Testing",
-                                              "customer": {"name": "Amrutha",
-                                                           "email": "amruthachaya4381@gmail.com",
-                                                           "contact": "9148169281"
-                                                           },
-                                              "notify":
-                                                  {
-                                                      "sms": True,
-                                                      "email": True
-                                                  }
+        order = cls.objects.get(id=order_id)
+        customer = Customer.objects.get(user=order.user)
+        ref_id = uuid.uuid4().__str__()
+        payment = client.payment_link.create(
+            {'amount': int(order.rent) * 100, 'currency': 'INR', "accept_partial": "true",
+             "first_min_partial_amount": 0, "description": "For Testing",
+             "customer": {"name": customer.user.first_name,
+                          "email": customer.user.email,
+                          "contact": customer.phone
+                          },
+             "notify":
+                 {
+                     "sms": True,
+                     "email": True
+                 },
+             "reminder_enable": True,
+             "notes": {
+                 "policy_name": "HireCar"
+             },
 
-                                              })
-        return cls.objects.filter(order_id=order_id).values('username', 'email')
+             "reference_id": ref_id,
+             "callback_url": "http://127.0.0.1:8000/Payment_Success/",
+             "callback_method": "get"
+             },
+        )
+
+        order.payment_id = ref_id
+        order.status = payment['status']
+        order.save()
+        print(payment)
+        return payment['short_url']
 
 
 class Tracking(models.Model):

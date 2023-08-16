@@ -3,6 +3,7 @@ from datetime import timezone
 import razorpay
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect
+from django.views.decorators.cache import cache_control
 from rest_framework.response import Response
 
 from CarRental.AWS import S3
@@ -13,6 +14,9 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework.views import APIView
 from rest_framework import status
+from django.http import HttpResponse
+from twilio.rest import Client
+from django.conf import settings
 
 from .ser import GpsTracker
 
@@ -67,6 +71,7 @@ def customer_signup(request):
     return render(request, "customer_signup.html", {"location": Location.city_list()})
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def customer_login(request):
     if request.user.is_authenticated:
         return redirect("/")
@@ -82,6 +87,7 @@ def customer_login(request):
                     if user1.type == "Customer":
                         login(request, user)
                         return redirect("/customer_homepage")
+
                     elif user1.type == "Car Dealer":
                         alert = True
                         return render(request, "customer_login.html", {'alert': alert})
@@ -175,6 +181,7 @@ def add_car(request):
         print(obj)
         print(S3().media_storage.url(obj))
         capacity = request.POST['capacity']
+        fuel_type = request.POST['fuel_type']
         rent = request.POST['rent']
         tracking = request.POST['tracking']
         car_dealer = CarDealer.objects.get(car_dealer=request.user)
@@ -183,12 +190,15 @@ def add_car(request):
         except:
             location = None
         if location is not None:
-            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=obj,
-                      rent=rent, tracking=tracking)
+            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location,
+                      capacity=capacity, image=obj,
+                      rent=rent, tracking=tracking, fuel_type=fuel_type)
+            car.save()
         else:
             location = Location(city=city)
-            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location, capacity=capacity, image=obj,
-                      rent=rent, tracking=tracking)
+            car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location,
+                      capacity=capacity, image=obj,
+                      rent=rent, tracking=tracking, fuel_type=fuel_type)
         car.save()
         alert = True
         return render(request, "add_car.html", {'alert': alert})
@@ -208,6 +218,7 @@ def edit_car(request, iid):
         vehicle_number = request.POST['vehicle_number']
         city = request.POST['city']
         capacity = request.POST['capacity']
+        fuel_type = request.POST['fuel_type']
         rent = request.POST['rent']
         device_id = request.POST['device_id']
 
@@ -216,6 +227,8 @@ def edit_car(request, iid):
         car.city = city
         car.capacity = capacity
         car.rent = rent
+        car.fuel_type = fuel_type
+        car.save()
         car.tracking = device_id
         car.save()
 
@@ -274,16 +287,18 @@ def order_details(request):
     car = Car.objects.get(id=car_id)
     if car.is_available:
         car_dealer = car.car_dealer
+        fuel_type = car.fuel_type
         rent = (int(car.rent)) * (int(days))
         car_dealer.earnings += rent
         car_dealer.save()
         start_time = int(datetime.datetime.now(tz=timezone.utc).timestamp())
         try:
-            order = Order(car=car, car_dealer=car_dealer, user=user, rent=rent, days=days, start_time=start_time)
+            order = Order(car=car, car_dealer=car_dealer, user=user, rent=rent, days=days, start_time=start_time,
+                          fuel_type=fuel_type)
             order.save()
         except:
             order = Order.objects.get(car=car, car_dealer=car_dealer, user=user, rent=rent, days=days,
-                                      start_time=start_time)
+                                      start_time=start_time, fuel_type=fuel_type)
         car.is_available = False
         car.save()
         order_notification()
@@ -354,6 +369,10 @@ def about_us(request):
     return render(request, "About_Us.html")
 
 
+def Payment_success(request):
+    return render(request, "test.html")
+
+
 class GpsView(APIView):
     def post(self, request):
         gps_data = request.query_params.dict()
@@ -378,7 +397,68 @@ class RoutPathView(APIView):
                       context={"data": Order.objects.get(id=order_id).rout_path})
 
 
-def create_link(order_id):
-    order_id = Order.objects.get(id=order_id)
-    return Response(order_id)
+def create_link(request, order_id):
+    payment_url = Order.make_payment(order_id)
+    payment_is_successful = Order.make_payment(order_id)
 
+    if payment_is_successful:
+        account_sid = 'AC7712ab00aec629716f5f5fd0a777aef1'
+        auth_token = 'a842a39c5cc3a528c50366f94cc26ab0'
+
+        client = Client(account_sid, auth_token)
+
+        from_number = '+12187520663'
+
+        to_number = '+919148169281'
+
+        message_body = 'Thank you for the payment! Your order has been successfully processed.'
+
+        message = client.messages.create(
+            body=message_body,
+            from_=from_number,
+            to=to_number
+        )
+
+    print(message.sid)
+    return redirect(payment_url)
+
+
+class payment_status(APIView):
+    def post(self, request):
+        try:
+            data = request.data or {}
+            if data.get('entity') == 'event':
+                ref_id = data['payload']['payment_link']['entity']['reference_id']
+                # print(ref_id)
+                order = Order.objects.get(payment_id=ref_id)
+                order.status = data['payload']['payment']['entity']['status']
+                # print(order.status)
+                order.save()
+            else:
+                return Response("Entity is not event", status=status.HTTP_400_BAD_REQUEST)
+            return Response("Order Confirmed")
+        except Order.DoesNotExist:
+            return Response("Id not found", status=status.HTTP_404_NOT_FOUND)
+
+
+def send_sms(request):
+    account_sid = 'AC7712ab00aec629716f5f5fd0a777aef1'
+    auth_token = 'ee84ebc377e578f16b2dc4fb564f9c0f'
+
+    client = Client(account_sid, auth_token)
+
+    from_number = '+12187520663'
+
+    to_number = '+919148169281'
+
+    message_body = 'Hello from Twilio and Django!'
+
+    message = client.messages.create(
+        body=message_body,
+        from_=from_number,
+        to=to_number
+    )
+
+    print(message.sid)
+
+    return HttpResponse("SMS sent successfully.")

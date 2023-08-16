@@ -18,7 +18,7 @@
             </div>
 
             <div class="form-group col-md-6">
-                <label><i style="font-weight: bold;">Car Image &nbsp;&nbsp;&nbsp;<a href="/media/{{car.url}}/">View Image</a></i></label>
+                <label><i style="font-weight: bold;">Car Image &nbsp;&nbsp;&nbsp;<a href="{{car.url}}">View Image</a></i></label>
                 <input type="file" class="form-control" name="image">
             </div>
                 <div class="form-group col-md-6">
@@ -31,6 +31,13 @@
             <div class="form-group col-md-12">
                 <label><i style="font-weight: bold;">Capacity</i></label>
                 <input type="number" class="form-control" name="capacity" value="{{car.capacity}}" required>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="form-group col-md-12">
+                <label><i style="font-weight: bold;">Fuel Type</i></label>
+                <input type="text" class="form-control" name="fuel_type" placeholder="fuel_type" required>
             </div>
         </div>
     
