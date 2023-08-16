@@ -41,6 +41,7 @@ class Car(models.Model):
     is_available = models.BooleanField(default=True)
     rent = models.CharField(max_length=10, blank=True)
     tracking = models.CharField(max_length=10, null=True)
+    fuel_type = models.CharField(max_length=10, null=True, blank=True, default='Petrol')
 
     # @classmethod
     # def last_location(cls, tracking_id):
@@ -101,6 +102,7 @@ class Order(models.Model):
     is_complete = models.BooleanField(default=False)
     payment_id = models.CharField(max_length=100, null=True, blank=True)
     status = models.CharField(max_length=30, default='Pending')
+    fuel_type = models.CharField(max_length=10, default='Petrol')
 
     @property
     def rout_path(self):

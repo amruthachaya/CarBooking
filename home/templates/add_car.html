@@ -44,19 +44,26 @@
     </div>
 
     <div class="row mt-3">
+            <div class="form-group col-md-12">
+                <label><i style="font-weight: bold;">Fuel Type</i></label>
+                <input type="text" class="form-control" name="fuel_type" placeholder="fuel_type">
+            </div>
+        </div>
+
+    <div class="row mt-3">
         <div class="form-group col-md-12">
             <label><i style="font-weight: bold;">Rent</i></label>
             <input type="number" class="form-control" name="rent" placeholder="Rent (per day)">
         </div>
     </div>
+
     <div class="row mt-3">
             <div class="form-group col-md-12">
                 <label><i style="font-weight: bold;">Device Id</i></label>
                 <input type="number" class="form-control" name="tracking" value="{{car.tracking}}" required>
             </div>
         </div>
-
-    <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
   </form>
   </div>
 {% endblock %}

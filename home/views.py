@@ -181,6 +181,7 @@ def add_car(request):
         print(obj)
         print(S3().media_storage.url(obj))
         capacity = request.POST['capacity']
+        fuel_type = request.POST['fuel_type']
         rent = request.POST['rent']
         tracking = request.POST['tracking']
         car_dealer = CarDealer.objects.get(car_dealer=request.user)
@@ -191,13 +192,13 @@ def add_car(request):
         if location is not None:
             car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location,
                       capacity=capacity, image=obj,
-                      rent=rent, tracking=tracking)
+                      rent=rent, tracking=tracking, fuel_type=fuel_type)
             car.save()
         else:
             location = Location(city=city)
             car = Car(name=car_name, vehicle_number=vehicle_number, car_dealer=car_dealer, location=location,
                       capacity=capacity, image=obj,
-                      rent=rent, tracking=tracking)
+                      rent=rent, tracking=tracking, fuel_type=fuel_type)
         car.save()
         alert = True
         return render(request, "add_car.html", {'alert': alert})
@@ -217,6 +218,7 @@ def edit_car(request, iid):
         vehicle_number = request.POST['vehicle_number']
         city = request.POST['city']
         capacity = request.POST['capacity']
+        fuel_type = request.POST['fuel_type']
         rent = request.POST['rent']
         device_id = request.POST['device_id']
 
@@ -225,6 +227,8 @@ def edit_car(request, iid):
         car.city = city
         car.capacity = capacity
         car.rent = rent
+        car.fuel_type = fuel_type
+        car.save()
         car.tracking = device_id
         car.save()
 
@@ -283,16 +287,18 @@ def order_details(request):
     car = Car.objects.get(id=car_id)
     if car.is_available:
         car_dealer = car.car_dealer
+        fuel_type = car.fuel_type
         rent = (int(car.rent)) * (int(days))
         car_dealer.earnings += rent
         car_dealer.save()
         start_time = int(datetime.datetime.now(tz=timezone.utc).timestamp())
         try:
-            order = Order(car=car, car_dealer=car_dealer, user=user, rent=rent, days=days, start_time=start_time)
+            order = Order(car=car, car_dealer=car_dealer, user=user, rent=rent, days=days, start_time=start_time,
+                          fuel_type=fuel_type)
             order.save()
         except:
             order = Order.objects.get(car=car, car_dealer=car_dealer, user=user, rent=rent, days=days,
-                                      start_time=start_time)
+                                      start_time=start_time, fuel_type=fuel_type)
         car.is_available = False
         car.save()
         order_notification()
@@ -397,7 +403,7 @@ def create_link(request, order_id):
 
     if payment_is_successful:
         account_sid = 'AC7712ab00aec629716f5f5fd0a777aef1'
-        auth_token = 'ee84ebc377e578f16b2dc4fb564f9c0f'
+        auth_token = 'a842a39c5cc3a528c50366f94cc26ab0'
 
         client = Client(account_sid, auth_token)
 
