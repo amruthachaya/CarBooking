@@ -462,3 +462,4 @@ def send_sms(request):
     print(message.sid)
 
     return HttpResponse("SMS sent successfully.")
+
