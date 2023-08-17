@@ -41,7 +41,7 @@ class Car(models.Model):
     is_available = models.BooleanField(default=True)
     rent = models.CharField(max_length=10, blank=True)
     tracking = models.CharField(max_length=10, null=True)
-    fuel_type = models.CharField(max_length=10, null=True, blank=True, default='Petrol')
+    fuel_type = models.CharField(null=True, blank=True, default='Petrol')
 
     # @classmethod
     # def last_location(cls, tracking_id):
@@ -100,9 +100,9 @@ class Order(models.Model):
     start_time = models.IntegerField(default=0)
     end_time = models.IntegerField(default=0)
     is_complete = models.BooleanField(default=False)
-    payment_id = models.CharField(max_length=100, null=True, blank=True)
-    status = models.CharField(max_length=30, default='Pending')
-    fuel_type = models.CharField(max_length=10, default='Petrol')
+    fuel_type = models.CharField(blank=True, null=True, default='Petrol')
+    status = models.CharField(default="Pending", null=True, blank=True)
+    reference_id = models.CharField(null=True, blank=True)
 
     @property
     def rout_path(self):
@@ -124,11 +124,6 @@ class Order(models.Model):
     def all_orders(cls, user):
         return cls.objects.filter(car_dealer__car_dealer=user).order_by('is_complete', '-id').select_related(
             'car_dealer', 'user', 'car')
-
-    # @classmethod
-    # def past_orders(cls, user):
-    #     return cls.objects.filter(car_dealer__user=user).order_by('is_complete', '-id').select_related(
-    #         'car_dealer', 'user', 'car')
 
     @classmethod
     def make_payment(cls, order_id):
@@ -153,13 +148,12 @@ class Order(models.Model):
                  "policy_name": "HireCar"
              },
 
-             "reference_id": ref_id,
-             "callback_url": "http://127.0.0.1:8000/Payment_Success/",
+             "callback_url": "http://127.0.0.1:8000/payment_success/",
              "callback_method": "get"
              },
         )
 
-        order.payment_id = ref_id
+        order.reference_id = ref_id
         order.status = payment['status']
         order.save()
         print(payment)

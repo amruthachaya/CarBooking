@@ -369,7 +369,7 @@ def about_us(request):
     return render(request, "About_Us.html")
 
 
-def Payment_success(request):
+def payment_success(request):
     return render(request, "test.html")
 
 
@@ -403,7 +403,7 @@ def create_link(request, order_id):
 
     if payment_is_successful:
         account_sid = 'AC7712ab00aec629716f5f5fd0a777aef1'
-        auth_token = 'a842a39c5cc3a528c50366f94cc26ab0'
+        auth_token = 'dff9d83c40745c5bfbecd18eead7806e'
 
         client = Client(account_sid, auth_token)
 
@@ -430,7 +430,7 @@ class payment_status(APIView):
             if data.get('entity') == 'event':
                 ref_id = data['payload']['payment_link']['entity']['reference_id']
                 # print(ref_id)
-                order = Order.objects.get(payment_id=ref_id)
+                order = Order.objects.get(reference_id=ref_id)
                 order.status = data['payload']['payment']['entity']['status']
                 # print(order.status)
                 order.save()
@@ -462,3 +462,4 @@ def send_sms(request):
     print(message.sid)
 
     return HttpResponse("SMS sent successfully.")
+

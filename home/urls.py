@@ -30,5 +30,5 @@ urlpatterns = [
     path("payment/status/", views.payment_status.as_view(), name="payment status"),
     path("payment/<order_id>/", views.create_link, name="payment"),
     path("sms/", views.send_sms, name="sms"),
-    path("Payment_Success/", views.Payment_success, name="Payment Success")
+    path("payment_success/", views.payment_success, name="Payment Success")
 ]
