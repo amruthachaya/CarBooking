@@ -429,10 +429,10 @@ class payment_status(APIView):
             data = request.data or {}
             if data.get('entity') == 'event':
                 ref_id = data['payload']['payment_link']['entity']['reference_id']
-                # print(ref_id)
+                print(ref_id)
                 order = Order.objects.get(reference_id=ref_id)
                 order.status = data['payload']['payment']['entity']['status']
-                # print(order.status)
+                print(order.status)
                 order.save()
             else:
                 return Response("Entity is not event", status=status.HTTP_400_BAD_REQUEST)
@@ -443,7 +443,7 @@ class payment_status(APIView):
 
 def send_sms(request):
     account_sid = 'AC7712ab00aec629716f5f5fd0a777aef1'
-    auth_token = 'ee84ebc377e578f16b2dc4fb564f9c0f'
+    auth_token = 'ee84ebc377e578f16b2dc4fb564f9c0f' # token value changes after some
 
     client = Client(account_sid, auth_token)
 
@@ -462,4 +462,3 @@ def send_sms(request):
     print(message.sid)
 
     return HttpResponse("SMS sent successfully.")
-
