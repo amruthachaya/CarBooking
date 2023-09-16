@@ -4,6 +4,16 @@
 {% endblock %}
 {% block body %}
 
+<style>
+        /* Add CSS styles to set the background image */
+        body {
+            background-image: url('https://images6.alphacoders.com/505/505465.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Keeps the background fixed while scrolling */
+        }
+    </style>
+
 <form style="border:1px solid #ccc" method="POST"> {% csrf_token %}
   <div class="container">
     <h1>Car Dealer Login</h1>

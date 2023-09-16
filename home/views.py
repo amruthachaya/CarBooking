@@ -47,6 +47,9 @@ def customer_signup(request):
         phone = request.POST['phone']
         city = request.POST['city']
 
+        if len(phone) != 10 or not phone.isdigit():
+            return redirect("/customer_signup")
+
         if password1 != password2:
             return redirect("/customer_signup")
 
@@ -403,7 +406,7 @@ def create_link(request, order_id):
 
     if payment_is_successful:
         account_sid = 'AC7712ab00aec629716f5f5fd0a777aef1'
-        auth_token = 'dff9d83c40745c5bfbecd18eead7806e'
+        auth_token = 'c9d821a41f8b5e5d842cbcf963f71fc0'
 
         client = Client(account_sid, auth_token)
 

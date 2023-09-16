@@ -16,10 +16,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'n8ys%5l3nhqivsh(-(l5-x-un3gmauda4+d_gw#+f#nz7-h*(l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["www.hirecar.online", "hirecar.online", "localhost", "127.0.0.1"]
-CSRF_TRUSTED_ORIGINS = ["https://hirecar.online", "https://www.hirecar.online"]
+ALLOWED_HOSTS = ["www.hirecar.online", "hirecar.online", "localhost", "127.0.0.1", "99c3-103-130-108-165.ngrok-free.app"]
+CSRF_TRUSTED_ORIGINS = ["https://hirecar.online", "https://www.hirecar.online",
+                        "https://99c3-103-130-108-165.ngrok-free.app"]
 
 # Application definition
 

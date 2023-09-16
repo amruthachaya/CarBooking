@@ -3,6 +3,15 @@
 {% block css %}
 {% endblock %}
 {% block body %}
+<style>
+        /* Add CSS styles to set the background image */
+        body {
+            background-image: url('https://wallpapers.com/images/featured/mahindra-thar-2021-bkshxu7y8dibj131.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Keeps the background fixed while scrolling */
+        }
+    </style>
 <div class="container mt-4">
 <b>Car : {{car.name}}</b>
 <form class="w3-container" action="/order_details/" method="post">

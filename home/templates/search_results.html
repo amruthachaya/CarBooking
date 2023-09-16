@@ -23,6 +23,14 @@
     td {
         border: 2px solid #ddd;
     }
+
+    /* Add CSS styles to set the background image */
+        body {
+            background-image: url('https://www.revv.co.in/blogs/wp-content/uploads/2020/09/rising-car-in-india.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Keeps the background fixed while scrolling */
+        }
 </style>
 {% endblock %}
 {% block body %}
@@ -56,7 +64,7 @@
         </table>
         {% else %}
         <br>
-        <h2>No Cars Available</h2>
+        <h2>Currently No Cars Available</h2>
         {% endif %}
     </div>
     {% endblock %}
